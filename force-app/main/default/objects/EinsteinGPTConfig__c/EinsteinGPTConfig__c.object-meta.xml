@@ -159,7 +159,6 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>Private</externalSharingModel>
-    <gender>Feminine</gender>
     <label>EinsteinGPTConfig</label>
     <nameField>
         <label>Config Name</label>
