@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>button_Flow__c</fullName>
+    <description>The flow to be executed when the button is clicked</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The flow API name to be executed when the button is clicked. (Prevent redirection)</inlineHelpText>
+    <label>button_Flow</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

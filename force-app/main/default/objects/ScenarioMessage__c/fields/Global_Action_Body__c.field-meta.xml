@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Global_Action_Body__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>Predifined value for the email body</inlineHelpText>
+    <label>Global Action Body</label>
+    <length>32768</length>
+    <trackTrending>false</trackTrending>
+    <type>Html</type>
+    <visibleLines>25</visibleLines>
+</CustomField>

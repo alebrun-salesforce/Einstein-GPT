@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>datatable_Table__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>title1,title2,title3
+value-a1,value-a2,value-a3
+value-b1,value-b2,value-b3</inlineHelpText>
+    <label>datatable_Table</label>
+    <length>32768</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <content>Einstein_GPT</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>standard-home</pageOrSobjectType>
+    </actionOverrides>
+    <brand>
+        <headerColor>#0070D2</headerColor>
+        <logo>AIArtificialIntelligenceIconSquare2</logo>
+        <logoVersion>1</logoVersion>
+        <shouldOverrideOrgTheme>true</shouldOverrideOrgTheme>
+    </brand>
+    <description>Configure Einstein GPT component scenarios</description>
+    <formFactors>Small</formFactors>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <label>Einstein GPT</label>
+    <navType>Standard</navType>
+    <tabs>standard-home</tabs>
+    <tabs>EinsteinGPTConfig__c</tabs>
+    <tabs>Scenario__c</tabs>
+    <uiType>Lightning</uiType>
+    <utilityBar>Einstein_GPT_UtilityBar</utilityBar>
+</CustomApplication>

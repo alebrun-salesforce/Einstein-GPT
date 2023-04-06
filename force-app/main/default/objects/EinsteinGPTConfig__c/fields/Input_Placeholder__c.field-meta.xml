@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Input_Placeholder__c</fullName>
+    <defaultValue>&quot;Type your message&quot;</defaultValue>
+    <description>The text shown on the user input when input is empty</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The text shown on the user input when input is empty</inlineHelpText>
+    <label>Input Placeholder</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

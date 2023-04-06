@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>UserMessage__c</fullName>
+    <description>The initial message by the user. It can be used to automatically generate the conversation or to be informative.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The message from the user before AI response.</inlineHelpText>
+    <label>UserMessage</label>
+    <length>32768</length>
+    <trackTrending>false</trackTrending>
+    <type>Html</type>
+    <visibleLines>25</visibleLines>
+</CustomField>

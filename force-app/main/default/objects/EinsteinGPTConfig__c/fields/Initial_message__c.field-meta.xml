@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Initial_message__c</fullName>
+    <description>First message of the AI</description>
+    <externalId>false</externalId>
+    <inlineHelpText>First message of the AI</inlineHelpText>
+    <label>Initial message</label>
+    <length>32768</length>
+    <trackTrending>false</trackTrending>
+    <type>Html</type>
+    <visibleLines>25</visibleLines>
+</CustomField>

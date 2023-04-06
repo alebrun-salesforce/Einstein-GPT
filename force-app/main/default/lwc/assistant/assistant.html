@@ -1,0 +1,38 @@
+<template>
+  <div class="ai-assistant-container">
+    <template if:false={UtilityBar}>
+    <div class="ai-assistant-header">
+      <button class="close-button" onclick={handleCloseButtonClick}>&times;</button>
+      {aiAssistantTitle}
+    </div>
+  </template>
+    <div class="ai-assistant-body">
+      <!-- Messages will be appended here -->
+    </div>
+    <div class="ai-assistant-input">
+      <input
+        class="message-input"
+        placeholder={inputPlaceholder}
+        onkeydown={handleInputKeyDown}
+        disabled
+      />
+    </div>
+  </div>
+
+  <template if:true={showModal}>
+  <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+    <div class="slds-modal__container">
+    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+    <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+    </svg>
+    <span class="slds-assistive-text">Cancel and close</span>
+    </button>
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+      <lightning-flow flow-api-name='Compte_rendu_de_r_union' onstatuschange={handleStatusChange}></lightning-flow>
+    </div>
+    </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+  </template>
+</template>
