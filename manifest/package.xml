@@ -117,5 +117,9 @@
         <members>ScenarioMessageElement__c.Tile</members>
         <name>RecordType</name>
     </types>
+    <types>
+        <members>EinsteinGPTforDemo</members>
+        <name>PermissionSet</name>
+    </types>
     <version>57.0</version>
 </Package>
