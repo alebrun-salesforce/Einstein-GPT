@@ -161,6 +161,7 @@ It will be used by the component to show the messages of the selected scenario.<
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
+    <gender>Masculine</gender>
     <label>ScenarioMessage</label>
     <nameField>
         <displayFormat>{0000}</displayFormat>

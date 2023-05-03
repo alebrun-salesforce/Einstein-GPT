@@ -2,7 +2,7 @@ public with sharing class EinsteinGPTConfigManager {
     @AuraEnabled(cacheable=false)
     public static List<EinsteinGPTConfig__c> getConfigs() {
         List<EinsteinGPTConfig__c> configs = [
-            SELECT Name, Id, AI_avatar_Image__c, Enable_OpenAI__c, Initial_message__c, Input_Placeholder__c, Message_source_type__c, OpenAPI_key__c, Prompt__c, Response_1__c, Response_2__c, Response_3__c, Response_4__c , Response_5__c , Response_6__c, Title__c, User_Avatar_Image__c, Default_record_ID__c
+            SELECT Name, Id, AI_avatar_Image__c, Enable_OpenAI__c, Initial_message__c, Input_Placeholder__c, Message_source_type__c, OpenAPI_key__c, Prompt__c, Response_1__c, Response_2__c, Response_3__c, Response_4__c , Response_5__c , Response_6__c, Title__c, User_Avatar_Image__c, Default_record_ID__c, styleFooterBorderTop__c, StyleHeaderColor__c, StyleHeaderBackgroundColor__c, styleHeaderHide__c, styleInboxBorder__c
             FROM EinsteinGPTConfig__c
         ];
         return configs;
@@ -48,7 +48,12 @@ public with sharing class EinsteinGPTConfigManager {
                 Response_5__c = 'Response 5',
                 Response_6__c = 'Response 6',
                 Title__c = 'Assistant',
-                User_Avatar_Image__c = 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Circle-icons-profile.svg'
+                User_Avatar_Image__c = 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Circle-icons-profile.svg',
+                styleFooterBorderTop__c ='3px solid #f3eeee',
+                StyleHeaderBackgroundColor__c='black',
+                StyleHeaderColor__c='white',
+                styleHeaderHide__c=false,
+                styleInboxBorder__c='1px solid grey'
             );
             insert defaultConfig;
         }

@@ -1,7 +1,10 @@
 <template>
   <div class="ai-assistant-container">
+
+    
     <template if:false={UtilityBar}>
     <div class="ai-assistant-header">
+      <span class="header-logo"><img class="header-logo-img" src={aiAvatarUrl}></img></span>
       <button class="close-button" onclick={handleCloseButtonClick}>&times;</button>
       {aiAssistantTitle}
     </div>
@@ -29,7 +32,7 @@
     <span class="slds-assistive-text">Cancel and close</span>
     </button>
     <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-      <lightning-flow flow-api-name='Compte_rendu_de_r_union' onstatuschange={handleStatusChange}></lightning-flow>
+      <lightning-flow flow-api-name='{flowName}' onstatuschange={handleStatusChange}></lightning-flow>
     </div>
     </div>
     </section>

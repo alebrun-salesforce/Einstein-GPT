@@ -38,7 +38,7 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
   - Access user personal calendar and task list
   - Trigger flows and screen flows
   And show GRAPHIC ELEMENTS in your messages as follow (you do it a lot):
-  - Show datatable, table, grid ( <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-label="Example default base table"><thead><tr class="slds-line-height_reset"></tr></thead><tbody><tr><td></td></tr></tbody></table>
+  - Show datatable, table, grid ( <table class="slds-table slds-table_fixed-layout slds-table_cell-buffer slds-table_bordered" aria-label="Example default base table"><thead><tr class="slds-line-height_reset"></tr></thead><tbody><tr><td></td></tr></tbody></table>
   - Show buttons (use this format: "<button href="#" class="slds-button slds-button_brand">TEXT</button>). You show it to make user confirm actions. (ex: sending email).
   - Show lists (<ol class="slds-list_dotted"><li></li><ol>)
   - Html formatting like <b>, <i>, etc..
@@ -72,6 +72,14 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
   @api AutoMessage = false;
   @api recordId;
   @api UtilityBar = false;
+
+  /** Style **/
+  @api styleHeaderHide = false;
+  @api styleHeaderBackgroundColor = 'grey';
+  @api styleHeaderColor = 'white;';
+  
+  @api styleFooterBorderTop = '3px solid #f3eeee';
+  @api styleInboxBorder = '1px solid #ccc';
  
 
   @wire(getScenarioMessages)
@@ -174,8 +182,6 @@ handleStatusChange(event) {
       else this.showAiAssistant();
     }
     if (event.shiftKey && event.code === 'KeyP') {
-      console.log(this.scenarioId);
-      console.log(this.recordId)
       //this.openGlobalAction("2F09D0900000NWsIt");
     }
   }
@@ -205,32 +211,69 @@ handleStatusChange(event) {
       const aiAssistantContainer = this.template.querySelector('.ai-assistant-container');
       aiAssistantContainer.style.setProperty('--chat-width', this.chatWidth);
 
-      if(this.chatPosition == "left"){
-        aiAssistantContainer.style.setProperty('--chat-top', '90px');
-        aiAssistantContainer.style.setProperty('--chat-left', '0');
-        aiAssistantContainer.style.setProperty('--chat-right', 'auto');
-        aiAssistantContainer.style.setProperty('--chat-bottom', '0');
-        aiAssistantContainer.style.setProperty('--chat-zindex', '100');
-      } else {
-        aiAssistantContainer.style.setProperty('--chat-top', '90px');
-        aiAssistantContainer.style.setProperty('--chat-left', 'auto');
-        aiAssistantContainer.style.setProperty('--chat-right', '0');
-        aiAssistantContainer.style.setProperty('--chat-bottom', '0');
-        aiAssistantContainer.style.setProperty('--chat-zindex', '100');
-        }
+       
+        this.applyConfigStyle();
         if(this.UtilityBar){
-          aiAssistantContainer.style.setProperty('--chat-top', 'auto');
+          aiAssistantContainer.style.setProperty('--assistant-body-top', "0px");
+          aiAssistantContainer.style.setProperty('--chat-top', '45px');
+          /*aiAssistantContainer.style.setProperty('--chat-top', 'auto');
           aiAssistantContainer.style.setProperty('--chat-left', 'auto');
           aiAssistantContainer.style.setProperty('--chat-right', 'auto');
           aiAssistantContainer.style.setProperty('--chat-bottom', 'auto');
           aiAssistantContainer.style.setProperty('--chat-zindex', '100');
-          this.template.querySelector('.ai-assistant-body').style.height = 'calc(100vh - 350px)';
-          this.template.querySelector('.ai-assistant-body').style.maxHeight = 'calc(100vh - 350px)';
+          /*this.template.querySelector('.ai-assistant-body').style.height = 'calc(100vh - 350px)';
+          this.template.querySelector('.ai-assistant-body').style.maxHeight = 'calc(100vh - 350px)';*/
+        } else {
+          if(this.chatPosition == "left"){
+            aiAssistantContainer.style.setProperty('--chat-top', '90px');
+            aiAssistantContainer.style.setProperty('--chat-left', '0');
+            aiAssistantContainer.style.setProperty('--chat-right', 'auto');
+            aiAssistantContainer.style.setProperty('--chat-bottom', '0');
+            aiAssistantContainer.style.setProperty('--chat-zindex', '100');
+          } else {
+            aiAssistantContainer.style.setProperty('--chat-top', '90px');
+            aiAssistantContainer.style.setProperty('--chat-left', 'auto');
+            aiAssistantContainer.style.setProperty('--chat-right', '0');
+            aiAssistantContainer.style.setProperty('--chat-bottom', '0');
+            aiAssistantContainer.style.setProperty('--chat-zindex', '100');
+            }
         }
-
       }
 
   }
+
+
+applyConfigStyle(){
+  if (this.hasRendered) {
+
+    const aiAssistantContainer = this.template.querySelector('.ai-assistant-container');
+
+    aiAssistantContainer.style.setProperty('--style-header-background', this.styleHeaderBackgroundColor);
+    aiAssistantContainer.style.setProperty('--style-header-color', this.styleHeaderColor);
+    aiAssistantContainer.style.setProperty('--assistant-body-bottom', "80px");
+    aiAssistantContainer.style.setProperty('--assistant-body-top', "50px");
+    aiAssistantContainer.style.setProperty('--message-input-border', this.styleFooterBorderTop);
+
+      if(this.UtilityBar){
+        //aiAssistantContainer.style.setProperty('--chat-top', 'auto');
+        this.template.querySelector('.ai-assistant-header').style.display = 'none';
+        aiAssistantContainer.style.setProperty('--assistant-body-top', "0px");
+        aiAssistantContainer.style.setProperty('--chat-top', '45px');
+      } else {
+
+        if(this.styleHeaderHide)
+        {
+          /*this.template.querySelector('.ai-assistant-header').style.display = 'none';*/
+          aiAssistantContainer.style.setProperty('--style-header-color', "grey");
+          aiAssistantContainer.style.setProperty('--assistant-body-top', "0px");
+          this.aiAssistantTitle = "";
+          this.template.querySelector('.ai-assistant-header').style.background = "transparent;"
+          
+        } else this.template.querySelector('.ai-assistant-header').style.display = '';
+      }
+    }
+}
+
 
 
   connectedCallback() {
@@ -268,6 +311,15 @@ try {
           //this.AutoMessage = this.config.Auto_Message__c; // Ensure to add Auto_Message__c to your SOQL query
           this.openAiApiKey = this.loadedConfiguration.OpenAPI_key__c; 
           this.prompt = this.loadedConfiguration.Prompt__c;
+
+
+          // Set Style
+          this.styleFooterBorderTop = this.loadedConfiguration.styleFooterBorderTop__c;
+          this.styleHeaderColor= this.loadedConfiguration.StyleHeaderColor__c;
+          this.styleHeaderBackgroundColor= this.loadedConfiguration.StyleHeaderBackgroundColor__c;
+          this.styleHeaderHide =this.loadedConfiguration.styleHeaderHide__c;
+          this.styleInboxBorder = this.loadedConfiguration.styleInboxBorder__c;
+          // End Style
 
           if(!this.recordId) this.recordId = this.loadedConfiguration.Default_record_ID__c;
 
@@ -401,6 +453,7 @@ try {
     if (container) {
       container.style.display = 'block';
     }
+    this.applyConfigStyle()
   }
 
   handleCloseButtonClick() {
@@ -423,6 +476,17 @@ try {
         this.sendNextResponse(message);
       }, 500);
     }
+  }
+
+  btnClicked(e){
+    e.preventDefault();
+    if(e.target.getAttribute("href") && e.target.getAttribute("href") =="#"){
+        this.addChatMessage(e.target.innerHTML, "user-message", this.userAvatarUrl);
+        this.lockInput(true);
+        setTimeout(() => {
+          this.sendNextResponse(e.target.innerHTML);
+        }, 500);
+    } else document.location.href = e.getAttribute("href");
   }
 
   addChatMessage(message, messageClass, avatarSrc) {
@@ -546,6 +610,8 @@ try {
           messageContent.innerHTML = message;
           if (extraContent) {
             messageContent.appendChild(extraContent);
+
+            this.template.querySelector('.btn-assistant-action').addEventListener("click", (e) => this.btnClicked(e));
           }
           this.lockInput(false);
   
@@ -655,7 +721,7 @@ try {
     let elementHTML = '';
   
     if (recordTypeName == 'Button') { // Button
-      elementHTML = `<button href="${element.buttonUrl}" class="slds-button slds-button_${element.buttonStyle}">${element.buttonText}</button>`;
+      elementHTML = `<span style="padding:10px;display:inline-block" class="btn-container"><button href="${element.buttonUrl}" class="btn-assistant-action slds-button slds-button_${element.buttonStyle}">${element.buttonText}</button></span>`;
     } else if (recordTypeName == 'Badge') { // badge
       elementHTML = `<span class="slds-badge ${element.badgeStyle}">${element.badgeTitle}</span>`;
     } else if (recordTypeName == 'Image'){ // image
@@ -695,7 +761,7 @@ try {
       const headers = rows[0].split(',');
     
       let tableHTML = `
-        <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-label="Example default base table">
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout" aria-label="Table">
           <thead>
             <tr class="slds-line-height_reset">`;
     
@@ -780,6 +846,7 @@ ${airesponse}
       let elementContent;
       if (response.elements && response.elements.length > 0) {
         elementContent = document.createElement('div');
+        elementContent.setAttribute("c-assistant_assistant", "");
         //elementContent.setAttribute("c-assistant_assistant", "");
         elementContent.className = 'message-buttons';
   
@@ -852,6 +919,14 @@ return realPrompt;
           //this.AutoMessage = this.config.Auto_Message__c; // Ensure to add Auto_Message__c to your SOQL query
           this.openAiApiKey = this.loadedConfiguration.OpenAPI_key__c; 
           this.prompt = this.loadedConfiguration.Prompt__c;
+
+          // Set Style
+          this.styleFooterBorderTop = this.loadedConfiguration.styleFooterBorderTop__c;
+          this.styleHeaderColor= this.loadedConfiguration.styleHeaderColor__c;
+          this.styleHeaderBackgroundColor= this.loadedConfiguration.styleHeaderBackgroundColor__c;
+          this.styleHeaderHide =this.loadedConfiguration.styleHeaderHide__c;
+          this.styleInboxBorder = this.loadedConfiguration.styleInboxBorder__c;
+          // End Style
 
 
           this.history = "";

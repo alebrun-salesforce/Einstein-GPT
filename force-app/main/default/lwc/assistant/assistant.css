@@ -10,21 +10,37 @@
     z-index: var(--chat-zindex, 100);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
+
+  .btn-container{
+    padding:10px;
+    display: inline-block;
+  }
+
+  .message-content button{
+    padding:10px;
+    display: inline-block;
+  }
   
   .ai-assistant-header {
-    background-color: #0070d2;
-    color: #ffffff;
+    background-color: var(--style-header-background, black);
+    color: var(--style-header-color, #ffffff);
     font-weight: bold;
     padding: 10px;
     font-size: 1.1rem;
+    border-bottom:2px solid #f3eeee;
+    height:50px;
   }
   
   .ai-assistant-body {
+    bottom: var(--assistant-body-bottom, 80px);
+    top: var(--assistant-body-top, 50px); 
+    overflow-y: auto;
+    position: absolute; 
+    width:100%;
     padding: 0px;
     font-size: 1rem;
-    overflow-y: auto;
-    max-height: calc(100vh - 250px);
-    height: calc(100vh - 250px);
+    background-color: white;
+
   }
   
   .message {
@@ -40,11 +56,11 @@
   
   .ai-message {
     align-items: flex-start;
+    background-color: #FFFFFF;
   }
   
   .user-message {
     align-items: flex-start;
-    background-color: #FFFFFF;
     color: #333;
   }
 
@@ -52,24 +68,35 @@
     align-self: center;
   }
 
-  
-  .ai-assistant-input {
-    padding: 10px;
+
+  .ai-assistant-header-icon {
+    height:40px;
+    vertical-align: middle;
   }
   
   .message-input {
-    width: 100%;
     padding: 20px;
     padding-left:5px;
     border: 1px solid #ccc;
     border-radius: 3px;
     font-size: 1rem;
+    width:100%;
+  }
+
+  .ai-assistant-input{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    height: 80px;
+    border-top: var(--message-input-border, 3px solid #f3eeee);
+    padding: 10px; 
   }
   
   .close-button {
     background-color: transparent;
     border: none;
-    color: #ffffff;
+    color: var(--style-header-color, #ffffff);
     cursor: pointer;
     font-size: 1.5rem;
     float: right;
@@ -82,9 +109,21 @@
     outline: none;
   }
 
+  .close-button-noheader{
+    background-color: transparent;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 1.5rem;
+    float: right;
+    line-height: 1;
+    margin-left: auto;
+    padding: 0;
+  }
+
   .avatar {
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     align-self: top;
     margin-right: 8px;
     text-align: center;
@@ -116,4 +155,20 @@
     padding:2px;
     margin-top:5px;
     width:100%;
+  }
+
+
+  .header-logo {
+    background-color: transparent;
+    border: none;
+    float: left;
+    line-height: 1;
+    margin-left: auto;
+    padding: 0;
+  }
+
+  .header-logo-img{
+    height:32px;
+    margin-right:10px;
+    padding-bottom:5px;
   }
