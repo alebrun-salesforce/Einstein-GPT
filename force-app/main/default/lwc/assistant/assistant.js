@@ -480,13 +480,19 @@ try {
 
   btnClicked(e){
     e.preventDefault();
-    if(e.target.getAttribute("href") && e.target.getAttribute("href") =="#"){
+    if(e.target.getAttribute("href") && e.target.getAttribute("href").match("flow")){
+      var flowName = e.target.getAttribute("href").split(/flow\//)[1];
+      this.openFlow(flowName)
+    }
+    else if(e.target.getAttribute("href") && e.target.getAttribute("href") =="#"){
         this.addChatMessage(e.target.innerHTML, "user-message", this.userAvatarUrl);
         this.lockInput(true);
         setTimeout(() => {
           this.sendNextResponse(e.target.innerHTML);
         }, 500);
-    } else document.location.href = e.getAttribute("href");
+    } else {
+      document.location.href = e.getAttribute("href");
+    }
   }
 
   addChatMessage(message, messageClass, avatarSrc) {
@@ -610,8 +616,10 @@ try {
           messageContent.innerHTML = message;
           if (extraContent) {
             messageContent.appendChild(extraContent);
-
-            this.template.querySelector('.btn-assistant-action').addEventListener("click", (e) => this.btnClicked(e));
+            var buttons = this.template.querySelectorAll('.btn-assistant-action');
+            buttons.forEach(btn =>
+              btn.addEventListener("click", (e) => this.btnClicked(e))
+            );
           }
           this.lockInput(false);
   
@@ -721,7 +729,9 @@ try {
     let elementHTML = '';
   
     if (recordTypeName == 'Button') { // Button
-      elementHTML = `<span style="padding:10px;display:inline-block" class="btn-container"><button href="${element.buttonUrl}" class="btn-assistant-action slds-button slds-button_${element.buttonStyle}">${element.buttonText}</button></span>`;
+      var href = element.buttonUrl;
+      if(element.buttonFlow && element.buttonFlow !="") href="flow/" + element.buttonFlow;
+      elementHTML = `<span style="padding:10px;display:inline-block" class="btn-container"><button href="${href}" class="btn-assistant-action slds-button slds-button_${element.buttonStyle}">${element.buttonText}</button></span>`;
     } else if (recordTypeName == 'Badge') { // badge
       elementHTML = `<span class="slds-badge ${element.badgeStyle}">${element.badgeTitle}</span>`;
     } else if (recordTypeName == 'Image'){ // image
