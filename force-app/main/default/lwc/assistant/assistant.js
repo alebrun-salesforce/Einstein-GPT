@@ -229,13 +229,13 @@ handleStatusChange(event) {
             aiAssistantContainer.style.setProperty('--chat-left', '0');
             aiAssistantContainer.style.setProperty('--chat-right', 'auto');
             aiAssistantContainer.style.setProperty('--chat-bottom', '0');
-            aiAssistantContainer.style.setProperty('--chat-zindex', '100');
+            aiAssistantContainer.style.setProperty('--chat-zindex', '1000');
           } else {
             aiAssistantContainer.style.setProperty('--chat-top', '90px');
             aiAssistantContainer.style.setProperty('--chat-left', 'auto');
             aiAssistantContainer.style.setProperty('--chat-right', '0');
             aiAssistantContainer.style.setProperty('--chat-bottom', '0');
-            aiAssistantContainer.style.setProperty('--chat-zindex', '100');
+            aiAssistantContainer.style.setProperty('--chat-zindex', '1000');
             }
         }
       }
