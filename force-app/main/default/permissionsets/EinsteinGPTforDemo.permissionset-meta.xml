@@ -81,12 +81,37 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>EinsteinGPTConfig__c.StyleHeaderBackgroundColor__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>EinsteinGPTConfig__c.StyleHeaderColor__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>EinsteinGPTConfig__c.Title__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>EinsteinGPTConfig__c.User_Avatar_Image__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>EinsteinGPTConfig__c.styleFooterBorderTop__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>EinsteinGPTConfig__c.styleHeaderHide__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>EinsteinGPTConfig__c.styleInboxBorder__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
