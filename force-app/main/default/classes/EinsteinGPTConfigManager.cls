@@ -51,7 +51,7 @@ public with sharing class EinsteinGPTConfigManager {
                 User_Avatar_Image__c = 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Circle-icons-profile.svg',
                 styleFooterBorderTop__c ='3px solid #f3eeee',
                 StyleHeaderBackgroundColor__c='black',
-                StyleHeaderColor__c='white',
+                styleHeaderColor__c='white',
                 styleHeaderHide__c=false,
                 styleInboxBorder__c='1px solid grey'
             );
