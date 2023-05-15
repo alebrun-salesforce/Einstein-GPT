@@ -574,11 +574,12 @@ try {
       if (el.recordTypeName == "Loading") {
         await this.handleLoadingElement(messageContent, el);
         loadingElementFound = true;
+        await this.typeWithEffect(messageContent, message, typingSpeed, extraContent, response);
         break;
       }
     }
     if (!loadingElementFound) {
-      await this.typeWithEffect(messageContent, message, typingSpeed);
+      await this.typeWithEffect(messageContent, message, typingSpeed, extraContent, response);
     }
   
     // Handle additional behaviors
@@ -604,35 +605,69 @@ try {
     messageContent.innerHTML = el.loadingTextAfter;
   }
   
-  async typeWithEffect(messageContent, message, typingSpeed) {
+  async typeWithEffect(messageContent, message, typingSpeed, extraContent, response) {
     const words = this.splitMessageWithTags(message);
-    
+  
     // Create a span element for the cursor
     const cursor = document.createElement('span');
     cursor.classList.add('blinking-cursor');
-    cursor.setAttribute('c-assistant_assistant', '');
     cursor.textContent = '|';
   
-    for (const word of words) {
-      if (word.startsWith('<') && word.endsWith('>')) {
-        messageContent.insertAdjacentHTML('beforeend', word);
-      } else {
-        messageContent.insertAdjacentText('beforeend', word);
-      }
-      
-      this.scrollChatToBottom();
+    let loadingElementFound = false;
   
-      // Add a blinking cursor at the end of the message only if there are more words to type
-      if (words.length > 0) {
-        messageContent.appendChild(cursor);
-      }
+    // Check for Loading elements
+    for (let i in response.elements) {
+      if (response.elements[i].recordTypeName == "Loading") {
+        messageContent.innerHTML = response.elements[i].loadingText;
+        messageContent.innerHTML += `<div role="status" class="slds-spinner slds-spinner_medium">
+        <span class="slds-assistive-text">Loading</span>
+        <div class="slds-spinner__dot-a"></div>
+        <div class="slds-spinner__dot-b"></div>
+      </div>`;
   
-      await this.wait(this.getRandomTypingSpeed(typingSpeed));
+        // Wait response.elements[i].loadingWait milliseconds
+        await this.wait(response.elements[i].loadingWait);
+        messageContent.innerHTML = response.elements[i].loadingTextAfter;
   
-      // Remove the blinking cursor before the next word
-      if (cursor.parentNode) {
-        cursor.parentNode.removeChild(cursor);
+        loadingElementFound = true;
+        break;
       }
+    }
+  
+    // If no loading element is found, continue typing immediately
+    if (!loadingElementFound) {
+      for (const word of words) {
+        if (word.startsWith('<') && word.endsWith('>')) {
+          messageContent.insertAdjacentHTML('beforeend', word);
+        } else {
+          messageContent.insertAdjacentText('beforeend', word);
+        }
+  
+        this.scrollChatToBottom();
+  
+        // Add a blinking cursor at the end of the message only if there are more words to type
+        if (words.length > 0) {
+          messageContent.appendChild(cursor);
+        }
+  
+        await this.wait(this.getRandomTypingSpeed(typingSpeed));
+  
+        // Remove the blinking cursor before the next word
+        if (cursor.parentNode) {
+          cursor.parentNode.removeChild(cursor);
+        }
+      }
+    }
+  
+    // Append extraContent if it's a DOM element
+    if (extraContent instanceof HTMLElement) {
+      messageContent.appendChild(extraContent);
+  
+      // Add event listeners to buttons if any
+      const buttons = this.template.querySelectorAll('.btn-assistant-action');
+      buttons.forEach(btn =>
+        btn.addEventListener("click", (e) => this.btnClicked(e))
+      );
     }
   
     // Unlock the input after the typing effect is complete
