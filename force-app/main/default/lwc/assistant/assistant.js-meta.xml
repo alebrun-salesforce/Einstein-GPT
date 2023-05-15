@@ -17,9 +17,9 @@
             <property name="configName" label="Enter the config name" type="String" default="Default Config" description="Einstein GPT config name"/>
 
             <property name="chatOpen" label="Opened by default" type="Boolean" default="True" description="Maj+L to open/close"/>
-            <property name="chatWidth" label="Chat width" type="String" default="30%" description="Size of the chat"/>
+            <property name="chatWidth" label="Chat width" type="String" default="40%" description="Size of the chat"/>
             <property name="chatPosition" label="Chat position" type="String" default="right" description="left or right"/>
-            <property name="aiTypingSpeed" label="AI Assistant Typing speed" type="Integer" description="AI typing speed." default="50" />
+            <property name="aiTypingSpeed" label="AI Assistant Typing speed" type="Integer" description="AI typing speed." default="10" />
             <property name="aiTypingSpeedRandomize" label="Randomize Speed" type="Boolean" description="Randomize the speed you provided for every chars" default="True" />
 
             <property name="AutoMessage" label="Test: Auto message" type="Boolean" description="Use it to generate all messages" default="False" />
@@ -31,9 +31,9 @@
             <property name="configName" label="Enter the config name" type="String" default="Default Config" description="Einstein GPT config name"/>
 
             <property name="chatOpen" label="Opened by default" type="Boolean" default="True" description="Maj+L to open/close"/>
-            <property name="chatWidth" label="Chat width" type="String" default="30%" description="Size of the chat"/>
+            <property name="chatWidth" label="Chat width" type="String" default="100%" description="Size of the chat"/>
             <property name="chatPosition" label="Chat position" type="String" default="right" description="left or right"/>
-            <property name="aiTypingSpeed" label="AI Assistant Typing speed" type="Integer" description="AI typing speed." default="50" />
+            <property name="aiTypingSpeed" label="AI Assistant Typing speed" type="Integer" description="AI typing speed." default="10" />
             <property name="aiTypingSpeedRandomize" label="Randomize Speed" type="Boolean" description="Randomize the speed you provided for every chars" default="True" />
 
             <property name="AutoMessage" label="Test: Auto message" type="Boolean" description="Use it to generate all messages" default="False" />

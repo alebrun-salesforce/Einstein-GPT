@@ -11,6 +11,23 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
 
+  .blinking-cursor {
+    animation: blink 1s step-end infinite;
+    background-color: black;
+    width: 9px;
+    display: inline-block;
+    padding: 10px auto;
+  }
+  
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+ 
   .btn-container{
     padding:10px;
     display: inline-block;

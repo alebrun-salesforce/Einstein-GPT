@@ -92,7 +92,6 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
   createDefaultConfig;
 
   async generateCompletion(prompt, maxTokens) {
-    const apiKey = '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';
     const endpoint = 'https://api.openai.com/v1/completions';
     const requestBody = {
       model: 'text-davinci-003',
@@ -121,6 +120,7 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
       console.error('Error calling generateCompletion:', error);
       return null;
     }
+
   }
   
   history = "";
@@ -542,167 +542,221 @@ try {
     return messageContent;  
   }
 
-  typeMessage(message, messageClass, typingSpeed, userMessage, extraContent, response) {
+  decodeHtmlEntity = (str) => {
+    return str
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&#(\d+);/g, function(match, dec) {
+        return String.fromCharCode(dec);
+      });
+  };
+
+  
+  ///// TYPE //////
+  async typeMessage(message, messageClass, typingSpeed, userMessage, extraContent, response) {
     message = message.replace(/<ul>/gi, '<ol class="slds-list_dotted">');
     message = message.replace(/<\/ul>/gi, '</ol>');
-    const regexOl = /<ol>/gi;
-    message = message.replace(regexOl, '<ol class="slds-list_dotted">');
-
-    if (typingSpeed == 0) {
-      const messageContent = this.addChatMessage(message, messageClass, this.aiAvatarUrl);
-      this.lockInput(false);
-      if(!messageContent) return false;
-  
-      // Set focus on the input element after the AI writes a message
-      const inputElement = this.template.querySelector('.message-input');
-      inputElement.focus();
-  
-      if (this.AutoMessage) {
-        if (!userMessage) userMessage = "TEST";
-        this.addChatMessage(userMessage, 'user-message', this.userAvatarUrl);
-        this.lockInput(true);
-        setTimeout(() => {
-          this.sendNextResponse(userMessage);
-        }, 500);
-      }
-      return true;
+    message = message.replace(/<ol>/gi, '<ol class="slds-list_dotted">');
+    if (typingSpeed === 0) {
+      return this.directMessage(message, messageClass, userMessage);
     }
-  
     const avatarSrc = this.aiAvatarUrl;
     const messageContent = this.addChatMessage('', messageClass, avatarSrc, extraContent);
-    if(!messageContent) return false;
-    let index = 0;
-    const htmlTagRegex = /<\/?[a-z][^>]*>/gi;
-  
-    const continueTyping = () => {
-      const getRandomTypingSpeed = (avgSpeed) => {
-        if (!this.aiTypingSpeedRandomize) return avgSpeed;
-        const minSpeed = avgSpeed * 0.01;
-        const maxSpeed = avgSpeed * 1.5;
-        return Math.random() * (maxSpeed - minSpeed) + minSpeed;
-      };
-  
-      const splitMessageWithTags = (message) => {
-        const regex = /(<[^>]*>|[^<>]+|\s+)/g;
-        return message.match(regex);
-      };
-  
-      const words = splitMessageWithTags(message);
-  
-      const typeNextWord = () => {
-        if (words.length > 0) {
-          const nextWord = words.shift();
-  
-          let nextHtmlTag = '';
-          if (nextWord.startsWith('<')) {
-            const tagMatch = nextWord.match(htmlTagRegex);
-            if (tagMatch && tagMatch[0]) {
-              nextHtmlTag = tagMatch[0];
-            }
-          }
-  
-          if (nextHtmlTag) {
-            messageContent.innerHTML += nextHtmlTag;
-            index += nextHtmlTag.length;
-          } else {
-            messageContent.innerHTML += nextWord;
-            index += nextWord.length;
-          }
-          const chatBody = this.template.querySelector('.ai-assistant-body');
-          chatBody.scrollTop = chatBody.scrollHeight;
-  
-          setTimeout(typeNextWord, getRandomTypingSpeed(typingSpeed));
-        } else {
-          messageContent.innerHTML = message;
-          if (extraContent) {
-            messageContent.appendChild(extraContent);
-            var buttons = this.template.querySelectorAll('.btn-assistant-action');
-            buttons.forEach(btn =>
-              btn.addEventListener("click", (e) => this.btnClicked(e))
-            );
-          }
-          this.lockInput(false);
-  
-          // Set focus on the input element after the AI writes a message
-          const inputElement = this.template.querySelector('.message-input');
-          this.chatFocus();
-  
-          if (response && response.action && response.action == "Open Email Composer") {
-            this.openGlobalAction(response.actionEmail_name, response.actionEmail_subject, response.actionEmail_body, response.actionEmail_to);
-          }
-          if (response && response.action && response.action == "Execute a flow") {
-            this.openFlow(response.flowName);
-          }
-  
-          if (this.AutoMessage && userMessage) {
-            if (userMessage)
-              this.addChatMessage(userMessage, 'user-message', this.userAvatarUrl);
-            this.lockInput(true);
-            setTimeout(() => {
-              this.sendNextResponse(userMessage);
-            }, 500);
-          }
-        }
-      };
-  
-      typeNextWord();
-      this.chatFocus();
-    };
-  
+    if (!messageContent) {
+      return false;
+    }
     let loadingElementFound = false;
+    if(response.e)
+    for (const el of response.elements) {
+      if (el.recordTypeName == "Loading") {
+        await this.handleLoadingElement(messageContent, el);
+        loadingElementFound = true;
+        break;
+      }
+    }
+    if (!loadingElementFound) {
+      await this.typeWithEffect(messageContent, message, typingSpeed);
+    }
   
-    // Check for Loading elements
-    for (let i in response.elements) {
-      if (response.elements[i].recordTypeName == "Loading") {
-        messageContent.innerHTML = response.elements[i].loadingText;
-        messageContent.innerHTML += `<div role="status" class="slds-spinner slds-spinner_medium">
+    // Handle additional behaviors
+    if (response && response.action) {
+      this.handleAction(response);
+    }
+  
+    if (this.AutoMessage && userMessage) {
+      await this.handleAutoMessage(userMessage);
+    }
+  }
+  
+  
+  async handleLoadingElement(messageContent, el) {
+    messageContent.innerHTML = el.loadingText;
+    messageContent.innerHTML += `
+      <div role="status" class="slds-spinner slds-spinner_medium">
         <span class="slds-assistive-text">Loading</span>
         <div class="slds-spinner__dot-a"></div>
         <div class="slds-spinner__dot-b"></div>
       </div>`;
+    await this.wait(el.loadingWait);
+    messageContent.innerHTML = el.loadingTextAfter;
+  }
   
-        // Wait response.elements[i].loadingWait milliseconds
-        setTimeout(() => {
-          messageContent.innerHTML = response.elements[i].loadingTextAfter;
-          continueTyping();
-        }, response.elements[i].loadingWait);
+  async typeWithEffect(messageContent, message, typingSpeed) {
+    const words = this.splitMessageWithTags(message);
+    
+    // Create a span element for the cursor
+    const cursor = document.createElement('span');
+    cursor.classList.add('blinking-cursor');
+    cursor.setAttribute('c-assistant_assistant', '');
+    cursor.textContent = '|';
   
-        loadingElementFound = true;
-        break;
-     
+    for (const word of words) {
+      if (word.startsWith('<') && word.endsWith('>')) {
+        messageContent.insertAdjacentHTML('beforeend', word);
+      } else {
+        messageContent.insertAdjacentText('beforeend', word);
+      }
+      
+      this.scrollChatToBottom();
+  
+      // Add a blinking cursor at the end of the message only if there are more words to type
+      if (words.length > 0) {
+        messageContent.appendChild(cursor);
+      }
+  
+      await this.wait(this.getRandomTypingSpeed(typingSpeed));
+  
+      // Remove the blinking cursor before the next word
+      if (cursor.parentNode) {
+        cursor.parentNode.removeChild(cursor);
       }
     }
-
-    // If no loading element is found, continue typing immediately
-    if (!loadingElementFound) {
-    continueTyping();
-    }
-    }  
   
-
-
-
-
-    decodeEntities = (function() {
-      // this prevents any overhead from creating the object each time
-      var element = document.createElement('div');
+    // Unlock the input after the typing effect is complete
+    this.lockInput(false);
+  }
+  
+  
+  
+  
+  scrollChatToBottom() {
+    const chatBody = this.template.querySelector('.ai-assistant-body');
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+  
+  wait(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+  }
+  
+  getRandomTypingSpeed(avgSpeed) {
+    if (!this.aiTypingSpeedRandomize) return avgSpeed;
+  
+    const minSpeed = avgSpeed * 0.01;
+    const maxSpeed = avgSpeed * 100;
+  
+    const power = 5; // Increase this to make smaller times more likely.
     
-      function decodeHTMLEntities (str) {
-        if(str && typeof str === 'string') {
-          // strip script/html tags
-          str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
-          //str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
-          element.innerHTML = str;
-          //str = element.textContent;
-          str = element.innerHTML;
-          element.textContent = '';
+    const randomNum = Math.random();
+    const weightedNum = Math.pow(randomNum, power);
+    return weightedNum * (maxSpeed - minSpeed) + minSpeed;
+  }
+  
+  
+  async directMessage(message, messageClass, userMessage) {
+    const messageContent = this.addChatMessage(message, messageClass, this.aiAvatarUrl);
+    this.lockInput(false);
+  
+    if (!messageContent) {
+      return false;
+    }
+  
+    this.focusInput();
+  
+    if (this.AutoMessage) {
+      if (!userMessage) userMessage = "TEST";
+      this.addChatMessage(userMessage, 'user-message', this.userAvatarUrl);
+      this.lockInput(true);
+  
+      setTimeout(() => {
+        this.sendNextResponse(userMessage);
+      }, 500);
+    }
+  
+    return true;
+  }
+  
+  focusInput() {
+    const inputElement = this.template.querySelector('.message-input');
+    inputElement.focus();
+  }
+  
+  async handleAutoMessage(userMessage) {
+    this.addChatMessage(userMessage, 'user-message', this.userAvatarUrl);
+    this.lockInput(true);
+  
+    await this.wait(500);
+    this.sendNextResponse(userMessage);
+  }
+  
+  handleAction(response) {
+    if (response.action == "Open Email Composer") {
+      this.openGlobalAction(response.actionEmail_name, response.actionEmail_subject, response.actionEmail_body, response.actionEmail_to);
+    }
+  
+    if (response.action == "Execute a flow") {
+      this.openFlow(response.flowName);
+    }
+  }
+  
+  splitMessageWithTags(message) {
+    const regex = /(<[^>]*>|[^<>]+)/g;
+    const splitMessage = message.match(regex);
+    const res = [];
+  
+    for (const str of splitMessage) {
+      if (str.startsWith('<') && str.endsWith('>')) {
+        res.push(str);
+      } else {
+        const strDecoded = this.decodeHtmlEntity(str);
+        let i = 0;
+        while (i < strDecoded.length) {
+          res.push(strDecoded.slice(i, i + 5));
+          i += 5;
         }
-    
-        return str;
       }
-    
-      return decodeHTMLEntities;
-    })();
+    }
+  
+    return res;
+  }
+  
+  
+
+  decodeEntities = (function() {
+    // this prevents any overhead from creating the object each time
+    var element = document.createElement('div');
+
+    function decodeHTMLEntities (str) {
+      if(str && typeof str === 'string') {
+        // strip script/html tags
+        str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+        str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+        element.innerHTML = str;
+        str = element.textContent;
+        element.textContent = '';
+      }
+
+      return str;
+    }
+
+    return decodeHTMLEntities;
+  })();
+
+
+
+  //// END TYPE ////
 
 
     UnescapeHtml(text) {
@@ -827,7 +881,6 @@ try {
 
   async sendNextResponse(userMessage) {
     if(!this.responses || !this.responses.length || this.responseCounter >= this.responses.length) {
-
       if(this.openAiApiKey){
         var airesponse = await this.generateCompletion(this.getPrompt(userMessage), 2000);
           var rep = [
@@ -850,9 +903,10 @@ ${airesponse}
           }
         } else return this.lockInput(false);
     }
+
     if (this.responseCounter < this.responses.length) {
       const response = this.responses[this.responseCounter];
-  
+
       let elementContent;
       if (response.elements && response.elements.length > 0) {
         elementContent = document.createElement('div');
@@ -868,7 +922,8 @@ ${airesponse}
           const element = tempContainer.firstChild;
           elementContent.appendChild(element);
         });
-      }
+      } else response.elements = [];
+
       this.responseCounter++;
       var nextMessage = "";
       if (this.responseCounter < this.responses.length) nextMessage = this.responses[this.responseCounter].userMessage;
