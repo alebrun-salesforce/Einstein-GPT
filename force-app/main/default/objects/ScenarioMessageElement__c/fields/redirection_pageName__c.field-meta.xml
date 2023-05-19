@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>redirection_pageName__c</fullName>
+    <externalId>false</externalId>
+    <label>redirection_ pageName</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>home</fullName>
+                <default>true</default>
+                <label>home</label>
+            </value>
+            <value>
+                <fullName>chatter</fullName>
+                <default>false</default>
+                <label>chatter</label>
+            </value>
+            <value>
+                <fullName>today</fullName>
+                <default>false</default>
+                <label>today</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

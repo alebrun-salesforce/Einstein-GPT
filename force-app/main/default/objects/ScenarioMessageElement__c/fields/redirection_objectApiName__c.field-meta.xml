@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>redirection_objectApiName__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>Your object API Name (eg: Account)</inlineHelpText>
+    <label>redirection_objectApiName</label>
+    <length>100</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

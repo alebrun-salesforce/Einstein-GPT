@@ -1,13 +1,19 @@
+.ai-assistant-builder{
+    height:30px;
+    background-color:brandHeader;
+    color:colorTextBrandPrimary;
+}
+
 .ai-assistant-container {
     display: none;
     position: fixed;
     top: var(--chat-top, 90px);
     left:var(--chat-left, auto);
-    right: var(--chat-right, 0);
+    right: var(--chat-righ¨t, 0);
     bottom: var(--chat-bottom, 0);
     width: var(--chat-width, 30%);
     background-color: #f3f3f3;
-    z-index: var(--chat-zindex, 100);
+    z-index: var(--chat-zindex, 10000);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
 

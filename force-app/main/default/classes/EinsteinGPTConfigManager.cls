@@ -2,7 +2,12 @@ public with sharing class EinsteinGPTConfigManager {
     @AuraEnabled(cacheable=false)
     public static List<EinsteinGPTConfig__c> getConfigs() {
         List<EinsteinGPTConfig__c> configs = [
-            SELECT Name, Id, AI_avatar_Image__c, Enable_OpenAI__c, Initial_message__c, Input_Placeholder__c, Message_source_type__c, OpenAPI_key__c, Prompt__c, Response_1__c, Response_2__c, Response_3__c, Response_4__c , Response_5__c , Response_6__c, Title__c, User_Avatar_Image__c, Default_record_ID__c, styleFooterBorderTop__c, StyleHeaderColor__c, StyleHeaderBackgroundColor__c, styleHeaderHide__c, styleInboxBorder__c
+            SELECT Name, Id, AI_avatar_Image__c, Enable_OpenAI__c, Initial_message__c, 
+            Input_Placeholder__c, Message_source_type__c, OpenAPI_key__c, Prompt__c, Response_1__c, 
+            Response_2__c, Response_3__c, Response_4__c , Response_5__c , Response_6__c, Title__c, 
+            User_Avatar_Image__c, Default_record_ID__c, styleFooterBorderTop__c, StyleHeaderColor__c, 
+            StyleHeaderBackgroundColor__c, styleHeaderHide__c, styleInboxBorder__c,
+            Word_by_word_Min__c, Word_by_word_Max__c
             FROM EinsteinGPTConfig__c
         ];
         return configs;
@@ -53,7 +58,9 @@ public with sharing class EinsteinGPTConfigManager {
                 StyleHeaderBackgroundColor__c='white',
                 styleHeaderColor__c='black',
                 styleHeaderHide__c=false,
-                styleInboxBorder__c='1px solid grey'
+                styleInboxBorder__c='1px solid grey',
+                Word_by_word_Max__c=5,
+                Word_by_word_Min__c=1
             );
             insert defaultConfig;
         }

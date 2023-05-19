@@ -26,8 +26,12 @@
                     <value>false</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
+                    <name>FullHeight</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
                     <name>aiTypingSpeed</name>
-                    <value>50</value>
+                    <value>10</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>aiTypingSpeedRandomize</name>
@@ -43,7 +47,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>chatWidth</name>
-                    <value>50%</value>
+                    <value>40%</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>configName</name>

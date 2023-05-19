@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>redirection_Type__c</fullName>
+    <description>Record Page - Navigate to a specific record page.
+Object Page - Navigate to the home page of an object.
+Named Page - Navigate to a named page, such as Home or Chatter.
+Nav Item Page - Navigate to a custom tab.
+External URL - Navigate to an external URL.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Record Page - Navigate to a specific record page.
+Object Page - Navigate to the home page of an object.
+Named Page - Navigate to a named page, such as Home or Chatter.
+Nav Item Page - Navigate to a custom tab.
+External URL - Navigate to an external URL.</inlineHelpText>
+    <label>redirection_Type</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>recordPage</fullName>
+                <default>false</default>
+                <label>recordPage</label>
+            </value>
+            <value>
+                <fullName>objectPage</fullName>
+                <default>false</default>
+                <label>objectPage</label>
+            </value>
+            <value>
+                <fullName>namedPage</fullName>
+                <default>false</default>
+                <label>namedPage</label>
+            </value>
+            <value>
+                <fullName>navItemPage</fullName>
+                <default>false</default>
+                <label>navItemPage</label>
+            </value>
+            <value>
+                <fullName>externalUrl</fullName>
+                <default>false</default>
+                <label>externalUrl</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

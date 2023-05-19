@@ -25,6 +25,7 @@
             <value>
                 <fullName>Scenario by ID</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>Scenario by ID</label>
             </value>
         </valueSetDefinition>

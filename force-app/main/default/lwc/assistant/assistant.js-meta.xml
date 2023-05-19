@@ -9,6 +9,8 @@
         <target>lightning__RecordPage</target>
         <target>lightning__HomePage</target>
         <target>lightning__UtilityBar</target>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AppPage,lightning__RecordPage,lightning__HomePage">
@@ -23,6 +25,7 @@
             <property name="aiTypingSpeedRandomize" label="Randomize Speed" type="Boolean" description="Randomize the speed you provided for every chars" default="True" />
 
             <property name="AutoMessage" label="Test: Auto message" type="Boolean" description="Use it to generate all messages" default="False" />
+            <property name="FullHeight" label="Full height" type="Boolean" description="Full height" default="False" />
         </targetConfig>
 
             
@@ -37,6 +40,27 @@
             <property name="aiTypingSpeedRandomize" label="Randomize Speed" type="Boolean" description="Randomize the speed you provided for every chars" default="True" />
 
             <property name="AutoMessage" label="Test: Auto message" type="Boolean" description="Use it to generate all messages" default="False" />
+             <property name="FullHeight" label="Full height" type="Boolean" description="Full height" default="False" />
+       
         </targetConfig>
+
+
+        <targetConfig targets="lightningCommunity__Default">
+            
+
+            <property name="configName" label="Enter the config name" type="String" default="Default Config" description="Einstein GPT config name"/>
+
+            <property name="chatOpen" label="Opened by default" type="Boolean" default="True" description="Maj+L to open/close"/>
+            <property name="chatWidth" label="Chat width" type="String" default="40%" description="Size of the chat"/>
+            <property name="chatPosition" label="Chat position" type="String" default="right" description="left or right"/>
+            <property name="aiTypingSpeed" label="AI Assistant Typing speed" type="Integer" description="AI typing speed." default="10" />
+            <property name="aiTypingSpeedRandomize" label="Randomize Speed" type="Boolean" description="Randomize the speed you provided for every chars" default="True" />
+
+            <property name="AutoMessage" label="Test: Auto message" type="Boolean" description="Use it to generate all messages" default="False" />
+
+            <property name="FullHeight" label="Full height" type="Boolean" description="Full height" default="False" />
+        </targetConfig>
+
+
     </targetConfigs>
 </LightningComponentBundle>

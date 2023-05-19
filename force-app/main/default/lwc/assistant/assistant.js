@@ -4,8 +4,10 @@ import getConfigs from '@salesforce/apex/EinsteinGPTConfigManager.getConfigs'
 import createDefaultConfig from '@salesforce/apex/EinsteinGPTConfigManager.createDefaultConfig'
 import { NavigationMixin } from 'lightning/navigation';
 import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
+import { getRecord } from 'lightning/uiRecordApi';
 
 export default class AiAssistant extends NavigationMixin(LightningElement) {
+  @api isBuilder = false;
   @api configName = "Default Config";
   loadedConfiguration;
   allconfigs;
@@ -71,7 +73,9 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
   @api aiTypingSpeedRandomize = false;
   @api AutoMessage = false;
   @api recordId;
+  @api objectApiName;
   @api UtilityBar = false;
+  @api FullHeight = false;
 
   /** Style **/
   @api styleHeaderHide = false;
@@ -80,6 +84,9 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
   
   @api styleFooterBorderTop = '3px solid #f3eeee';
   @api styleInboxBorder = '1px solid #ccc';
+
+  wordByWordMin = 1;
+  wordByWordMax = 5;
  
 
   @wire(getScenarioMessages)
@@ -90,6 +97,48 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
 
   @wire(createDefaultConfig)
   createDefaultConfig;
+
+  record;
+  error;
+  recordString = 'Loading record data...';
+  
+  @wire(getRecord, { recordId: '$recordId', layoutTypes: ['Full'] })
+  wiredRecord({ error, data }) {
+    this.recordString += " Wired record function called...";
+    if (data) {
+      this.recordString += ' Data found';
+      this.record = data;
+      this.error = undefined;
+  
+      let output = '';
+      for (let field in data.fields) {
+        // Skip fields that have "Id" in the name
+        if (field.includes('Id')) {
+          continue;
+        }
+  
+        let value = data.fields[field].value;
+  
+        // If the value is an object, convert it to a string.
+        if (typeof value === 'object' && value !== null) {
+          value = JSON.stringify(value);
+        }
+  
+        output += `${field}: ${value}\n`;
+      }
+      this.recordString = output;  // Update the property directly
+    } else if (error) {
+      this.error = error;
+      this.record = undefined;
+      console.error('Error loading record: ', JSON.stringify(error));
+      this.recordString = `Error: ${error}`;  // Update the property directly
+    } else {
+      this.recordString += ' No data or error...';
+      //console.error('Unexpected state: No data or error received');
+    }
+  }
+  
+
 
   async generateCompletion(prompt, maxTokens) {
     const endpoint = 'https://api.openai.com/v1/completions';
@@ -147,6 +196,93 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
   this.chatFocus();
   }
 
+  async handleRedirection(destination) {;
+    if (!destination || !destination.type) {
+      console.error('Invalid destination object provided');
+      return;
+    }
+
+    switch (destination.type) {
+      case 'recordPage':
+        if (destination.recordId) {
+          this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+              recordId: destination.recordId,
+              objectApiName: destination.apiName || 'Account', // Use default objectApiName if not provided
+              actionName: destination.actionName || 'view', // Use default actionName if not provided
+            },
+          });
+        } else {
+          console.error('Record ID is required for recordPage redirection');
+        }
+        break;
+      case 'objectPage':
+        if (destination.objectApiName) {
+          this[NavigationMixin.Navigate]({
+            type: 'standard__objectPage',
+            attributes: {
+              objectApiName: destination.apiName,
+              actionName: destination.actionName || 'list', // Use default actionName if not provided
+            },
+          });
+        } else {
+          console.error('Object API Name is required for objectPage redirection');
+        }
+        break;
+      case 'namedPage':
+        this[NavigationMixin.Navigate]({
+          type: 'standard__namedPage',
+          attributes: {
+            pageName: destination.pageName,
+          },
+        });
+        break;
+      case 'navItemPage':
+        if (destination.apiName) {
+          this[NavigationMixin.Navigate]({
+            type: 'standard__navItemPage',
+            attributes: {
+              apiName: destination.apiName,
+            },
+          });
+        } else {
+          console.error('API Name is required for navItemPage redirection');
+        }
+        break;
+      case 'customPage':
+        if (destination.componentName) {
+          this[NavigationMixin.Navigate]({
+            type: 'standard__component',
+            attributes: {
+              componentName: destination.componentName,
+            },
+            state: {
+              ...destination.state,
+            },
+          });
+        } else {
+          console.error('Component Name is required for customPage redirection');
+        }
+        break;
+      case 'externalUrl':
+        if (destination.url) {
+          this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: {
+              url: destination.url,
+            },
+          });
+        } else {
+          console.error('URL is required for externalUrl redirection');
+        }
+        break;
+      default:
+        console.error('Invalid redirection type provided');
+    }
+  }
+  
+
   openFlow(flowApiName, type) {
     this.flowName = flowApiName;
     this.showModal = true;
@@ -178,13 +314,17 @@ handleStatusChange(event) {
 
   handleKeyDown(event) {
     if (event.shiftKey && event.code === 'KeyL') {
+      //event.preventDefault();
       if(this.showModal == false) this.chatFocus();
-      else this.showAiAssistant();
+      else {
+        this.showAiAssistant();
+      }
     }
     if (event.shiftKey && event.code === 'KeyP') {
       //this.openGlobalAction("2F09D0900000NWsIt");
     }
   }
+
 
   chatFocus(){
     this.showAiAssistant(true);
@@ -194,6 +334,7 @@ handleStatusChange(event) {
     inputElement.focus();
   }
 
+
   renderedCallback() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
     if(this.chatOpen)
@@ -201,17 +342,11 @@ handleStatusChange(event) {
 
       //this.addChatMessage(this.aiAssistantMessage, 'ai-message', this.aiAvatarUrl);
 
-
-
     if (!this.hasRendered) {
       this.hasRendered = true;
 
-
-
       const aiAssistantContainer = this.template.querySelector('.ai-assistant-container');
       aiAssistantContainer.style.setProperty('--chat-width', this.chatWidth);
-
-       
         this.applyConfigStyle();
         if(this.UtilityBar){
           aiAssistantContainer.style.setProperty('--assistant-body-top', "0px");
@@ -229,13 +364,17 @@ handleStatusChange(event) {
             aiAssistantContainer.style.setProperty('--chat-left', '0');
             aiAssistantContainer.style.setProperty('--chat-right', 'auto');
             aiAssistantContainer.style.setProperty('--chat-bottom', '0');
-            aiAssistantContainer.style.setProperty('--chat-zindex', '1000');
+            aiAssistantContainer.style.setProperty('--chat-zindex', '10000');
           } else {
             aiAssistantContainer.style.setProperty('--chat-top', '90px');
             aiAssistantContainer.style.setProperty('--chat-left', 'auto');
             aiAssistantContainer.style.setProperty('--chat-right', '0');
             aiAssistantContainer.style.setProperty('--chat-bottom', '0');
-            aiAssistantContainer.style.setProperty('--chat-zindex', '1000');
+            aiAssistantContainer.style.setProperty('--chat-zindex', '10000');
+            if(this.FullHeight){
+              aiAssistantContainer.style.setProperty('--chat-bottom', "0px");
+              aiAssistantContainer.style.setProperty('--chat-top', "0px");
+            }
             }
         }
       }
@@ -245,7 +384,6 @@ handleStatusChange(event) {
 
 applyConfigStyle(){
   if (this.hasRendered) {
-
     const aiAssistantContainer = this.template.querySelector('.ai-assistant-container');
 
     aiAssistantContainer.style.setProperty('--style-header-background', this.styleHeaderBackgroundColor);
@@ -253,10 +391,9 @@ applyConfigStyle(){
     aiAssistantContainer.style.setProperty('--assistant-body-bottom', "80px");
     aiAssistantContainer.style.setProperty('--assistant-body-top', "50px");
     aiAssistantContainer.style.setProperty('--message-input-border', this.styleFooterBorderTop);
-
       if(this.UtilityBar){
         //aiAssistantContainer.style.setProperty('--chat-top', 'auto');
-        this.template.querySelector('.ai-assistant-header').style.display = 'none';
+        //this.template.querySelector('.ai-assistant-header').style.display = 'none';
         aiAssistantContainer.style.setProperty('--assistant-body-top', "0px");
         aiAssistantContainer.style.setProperty('--chat-top', '45px');
       } else {
@@ -270,7 +407,16 @@ applyConfigStyle(){
           this.template.querySelector('.ai-assistant-header').style.background = "transparent;"
           
         } else this.template.querySelector('.ai-assistant-header').style.display = '';
+
+        if(this.FullHeight){
+          aiAssistantContainer.style.setProperty('--chat-bottom', "0px");
+          aiAssistantContainer.style.setProperty('--chat-top', "0px");
+        }
       }
+
+
+
+
     }
 }
 
@@ -320,6 +466,9 @@ try {
           this.styleHeaderHide =this.loadedConfiguration.styleHeaderHide__c;
           this.styleInboxBorder = this.loadedConfiguration.styleInboxBorder__c;
           // End Style
+
+          this.wordByWordMin = this.loadedConfiguration.Word_by_word_Min__c;
+          this.wordByWordMax = this.loadedConfiguration.Word_by_word_Max__c;
 
           if(!this.recordId) this.recordId = this.loadedConfiguration.Default_record_ID__c;
 
@@ -389,6 +538,12 @@ try {
                                     loadingText: element.loading_Text__c,
                                     loadingWait: element.loading_Wait__c,
                                     loadingTextAfter: element.loading_TextAfter__c,
+                                    htmlContent: element.html_Content__c,
+                                    redirectionPageName: element.redirection_pageName__c, 
+                                    redirectionActionName: element.redirection_actionName__c, 
+                                    redirectionApiName: element.redirection_objectApiName__c, 
+                                    redirectionRecordId:element.redirection_RecordId__c, 
+                                    redirectionType:element.redirection_Type__c,
                                     order: element.Order__c,
                                   })) : [];
       
@@ -557,6 +712,7 @@ try {
   
   ///// TYPE //////
   async typeMessage(message, messageClass, typingSpeed, userMessage, extraContent, response) {
+    if(!message) message = "";
     message = message.replace(/<ul>/gi, '<ol class="slds-list_dotted">');
     message = message.replace(/<\/ul>/gi, '</ol>');
     message = message.replace(/<ol>/gi, '<ol class="slds-list_dotted">');
@@ -568,22 +724,11 @@ try {
     if (!messageContent) {
       return false;
     }
-    let loadingElementFound = false;
-    if(response.e)
-    for (const el of response.elements) {
-      if (el.recordTypeName == "Loading") {
-        await this.handleLoadingElement(messageContent, el);
-        loadingElementFound = true;
-        await this.typeWithEffect(messageContent, message, typingSpeed, extraContent, response);
-        break;
-      }
-    }
-    if (!loadingElementFound) {
-      await this.typeWithEffect(messageContent, message, typingSpeed, extraContent, response);
-    }
+
+    await this.typeWithEffect(messageContent, message, typingSpeed, extraContent, response);
   
     // Handle additional behaviors
-    if (response && response.action) {
+    if (response) {
       this.handleAction(response);
     }
   
@@ -592,21 +737,8 @@ try {
     }
   }
   
-  
-  async handleLoadingElement(messageContent, el) {
-    messageContent.innerHTML = el.loadingText;
-    messageContent.innerHTML += `
-      <div role="status" class="slds-spinner slds-spinner_medium">
-        <span class="slds-assistive-text">Loading</span>
-        <div class="slds-spinner__dot-a"></div>
-        <div class="slds-spinner__dot-b"></div>
-      </div>`;
-    await this.wait(el.loadingWait);
-    messageContent.innerHTML = el.loadingTextAfter;
-  }
-  
   async typeWithEffect(messageContent, message, typingSpeed, extraContent, response) {
-    const words = this.splitMessageWithTags(message);
+    const words = this.splitMessageWithTags(message, this.wordByWordMin, this.wordByWordMax);
   
     // Create a span element for the cursor
     const cursor = document.createElement('span');
@@ -634,15 +766,24 @@ try {
       }
     }
   
+    loadingElementFound = false;
     // If no loading element is found, continue typing immediately
     if (!loadingElementFound) {
+      var allcontent = "";
       for (const word of words) {
+        allcontent+=word;
+    
         if (word.startsWith('<') && word.endsWith('>')) {
-          messageContent.insertAdjacentHTML('beforeend', word);
+          if(!word.match(/<li(\s|>)/i))
+            messageContent.insertAdjacentHTML('beforeend', word);
+          if(word.match(/<\/[a-zA-Z0-9]+>/i)){ // endtag
+            messageContent.innerHTML = allcontent;
+          }
+          //messageContent.innerHTML += word;
         } else {
-          messageContent.insertAdjacentText('beforeend', word);
+           messageContent.insertAdjacentText('beforeend', word);
+          //messageContent.innerHTML += word;
         }
-  
         this.scrollChatToBottom();
   
         // Add a blinking cursor at the end of the message only if there are more words to type
@@ -656,9 +797,12 @@ try {
         if (cursor.parentNode) {
           cursor.parentNode.removeChild(cursor);
         }
+        
       }
     }
   
+    messageContent.innerHTML = message;
+
     // Append extraContent if it's a DOM element
     if (extraContent instanceof HTMLElement) {
       messageContent.appendChild(extraContent);
@@ -670,8 +814,11 @@ try {
       );
     }
   
+    this.scrollChatToBottom();
+
     // Unlock the input after the typing effect is complete
     this.lockInput(false);
+    this.chatFocus();
   }
   
   
@@ -736,17 +883,34 @@ try {
     this.sendNextResponse(userMessage);
   }
   
-  handleAction(response) {
-    if (response.action == "Open Email Composer") {
+  async handleAction(response) {
+    if (response.action && response.action == "Open Email Composer") {
       this.openGlobalAction(response.actionEmail_name, response.actionEmail_subject, response.actionEmail_body, response.actionEmail_to);
     }
   
-    if (response.action == "Execute a flow") {
+    if (response.action && response.action == "Execute a flow") {
       this.openFlow(response.flowName);
     }
+
+
+    for (let i in response.elements) {
+      if (response.elements[i].recordTypeName == "Redirection") {
+        var redirection = {
+          pageName: response.elements[i].redirectionPageName, 
+          actionName: response.elements[i].redirectionActionName, 
+          apiName: response.elements[i].redirectionApiName, 
+          recordId:response.elements[i].redirectionRecordId,  
+          type:response.elements[i].redirectionType,
+          url: response.elements[i].buttonUrl
+        };
+          await this.wait(1500);
+          this.handleRedirection(redirection)
+      }
+    }
+
   }
   
-  splitMessageWithTags(message) {
+  splitMessageWithTags(message, minLength, maxLength) {
     const regex = /(<[^>]*>|[^<>]+)/g;
     const splitMessage = message.match(regex);
     const res = [];
@@ -758,15 +922,19 @@ try {
         const strDecoded = this.decodeHtmlEntity(str);
         let i = 0;
         while (i < strDecoded.length) {
-          res.push(strDecoded.slice(i, i + 5));
-          i += 5;
+          const segmentLength = Math.min(Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, strDecoded.length - i);
+          res.push(strDecoded.slice(i, i + segmentLength));
+          i += segmentLength;
         }
       }
     }
   
     return res;
   }
+
   
+
+
   
 
   decodeEntities = (function() {
@@ -816,8 +984,10 @@ try {
   
   createElementHTML(recordTypeName, element) {
     let elementHTML = '';
-  
-    if (recordTypeName == 'Button') { // Button
+    if(recordTypeName == "HTML"){
+      elementHTML = "<div>" + element.htmlContent + "</div>";
+    }
+    else if (recordTypeName == 'Button') { // Button
       var href = element.buttonUrl;
       if(element.buttonFlow && element.buttonFlow !="") href="flow/" + element.buttonFlow;
       elementHTML = `<span style="padding:10px;display:inline-block" class="btn-container"><button href="${href}" class="btn-assistant-action slds-button slds-button_${element.buttonStyle}">${element.buttonText}</button></span>`;
@@ -976,9 +1146,26 @@ ${airesponse}
   }
 
   // Add https://api.openai.com/ to trusted site
+
+
   getPrompt(usermessage){
-      var realPrompt = 
-`${this.prompt}
+var recordContext = ``;
+if(this.record)
+  {
+    recordContext = `
+      // Current salesforce record page //
+      Object: ${this.objectApiName}
+      Data:
+      ${this.recordString}
+      ////////////////////////
+    `
+  } 
+
+
+      var realPrompt = `${this.prompt}
+
+${recordContext}
+
 
 ${this.history}
 
@@ -1028,6 +1215,8 @@ return realPrompt;
           this.styleInboxBorder = this.loadedConfiguration.styleInboxBorder__c;
           // End Style
 
+          this.wordByWordMin = this.loadedConfiguration.Word_by_word_Min__c;
+          this.wordByWordMax = this.loadedConfiguration.Word_by_word_Max__c;
 
           this.history = "";
           this.responseCounter = 0;
