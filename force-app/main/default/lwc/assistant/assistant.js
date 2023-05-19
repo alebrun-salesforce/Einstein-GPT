@@ -26,6 +26,7 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
   Response5 = 'Response 5';
   Response6 = 'Response 6'; 
   openAiApiKey = '';
+  openAiApiVersion = '';
   BasicMessages = false;
   prompt=`You act as an AI assistant chat integrated in Salesforce (It is a simulation so pretend everything described below is true).
   You have access to Internet, All the Salesforce data, all the user data.
@@ -141,36 +142,51 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
 
 
   async generateCompletion(prompt, maxTokens) {
-    const endpoint = 'https://api.openai.com/v1/completions';
-    const requestBody = {
-      model: 'text-davinci-003',
-      prompt: prompt,
-      temperature: 0.7,
-      max_tokens: maxTokens,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-    };
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.openAiApiKey}`,
-      },
-      body: JSON.stringify(requestBody),
-    };
-  
-    try {
-      const response = await fetch(endpoint, requestOptions);
-      const jsonResponse = await response.json();
-      const completionText = jsonResponse.choices[0].text;
-      return completionText;
-    } catch (error) {
-      console.error('Error calling generateCompletion:', error);
-      return null;
+    let endpoint;
+    let requestBody;
+    if (this.openAiApiVersion == "gpt-4") {
+        endpoint = 'https://api.openai.com/v1/chat/completions';
+
+        requestBody = {
+            model: this.openAiApiVersion,
+            messages: [
+                {"role": "system", "content": "Start of the conversation"},
+                {"role": "user", "content": prompt}
+            ],
+        };
+    } else {
+        endpoint = 'https://api.openai.com/v1/completions';
+        requestBody = {
+            model: 'text-davinci-003',
+            prompt: prompt,
+            temperature: 0.7,
+            max_tokens: maxTokens,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+        };
     }
 
-  }
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.openAiApiKey}`,
+        },
+        body: JSON.stringify(requestBody),
+    };
+
+    try {
+        const response = await fetch(endpoint, requestOptions);
+        const jsonResponse = await response.json();
+        const completionText = this.openAiApiVersion == "gpt-4" ? jsonResponse.choices[0].message.content : jsonResponse.choices[0].text;
+        return completionText;
+    } catch (error) {
+        console.error('Error calling generateCompletion:', error);
+        return null;
+    }
+}
+
   
   history = "";
   responseCounter = 0;
@@ -430,8 +446,6 @@ createDefaultConfig()
 try {
   getConfigs()
     .then((configsall) => {
-      //console.log("Configs data:", configsall); // Add a log to check the data
-      //console.log(this.configName)
       this.allconfigs = configsall;
       const matchingConfig = configsall.find(
         (config) => config.Name === this.configName
@@ -455,7 +469,8 @@ try {
           this.Response5 = this.loadedConfiguration.Response_5__c;
           this.Response6 = this.loadedConfiguration.Response_6__c;
           //this.AutoMessage = this.config.Auto_Message__c; // Ensure to add Auto_Message__c to your SOQL query
-          this.openAiApiKey = this.loadedConfiguration.OpenAPI_key__c; 
+          this.openAiApiKey = this.loadedConfiguration.OpenAPI_key__c;
+          this.openAiApiVersion = this.loadedConfiguration.openApi_version__c;
           this.prompt = this.loadedConfiguration.Prompt__c;
 
 
@@ -1205,6 +1220,7 @@ return realPrompt;
           this.Response6 = this.loadedConfiguration.Response_6__c;
           //this.AutoMessage = this.config.Auto_Message__c; // Ensure to add Auto_Message__c to your SOQL query
           this.openAiApiKey = this.loadedConfiguration.OpenAPI_key__c; 
+          this.openAiApiVersion = this.loadedConfiguration.openApi_version__c;
           this.prompt = this.loadedConfiguration.Prompt__c;
 
           // Set Style

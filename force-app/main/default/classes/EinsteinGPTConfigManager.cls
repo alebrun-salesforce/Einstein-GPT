@@ -3,7 +3,7 @@ public with sharing class EinsteinGPTConfigManager {
     public static List<EinsteinGPTConfig__c> getConfigs() {
         List<EinsteinGPTConfig__c> configs = [
             SELECT Name, Id, AI_avatar_Image__c, Enable_OpenAI__c, Initial_message__c, 
-            Input_Placeholder__c, Message_source_type__c, OpenAPI_key__c, Prompt__c, Response_1__c, 
+            Input_Placeholder__c, Message_source_type__c, OpenAPI_key__c,openApi_version__c, Prompt__c, Response_1__c, 
             Response_2__c, Response_3__c, Response_4__c , Response_5__c , Response_6__c, Title__c, 
             User_Avatar_Image__c, Default_record_ID__c, styleFooterBorderTop__c, StyleHeaderColor__c, 
             StyleHeaderBackgroundColor__c, styleHeaderHide__c, styleInboxBorder__c,
@@ -25,6 +25,7 @@ public with sharing class EinsteinGPTConfigManager {
                 Input_Placeholder__c = 'Type your message...',
                 Message_source_type__c = 'Basic Responses',
                 OpenAPI_key__c = '',
+                openApi_version__c = 'text-davinci-003',
                 Prompt__c = 'You act as an AI assistant chat integrated in Salesforce (It is a simulation so pretend everything described below is true).' +
                 'You have access to Internet, All the Salesforce data, all the user data.' +
                 'You can also make actions :' +

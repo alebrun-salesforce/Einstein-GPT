@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>openApi_version__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>Version of openAPI (be careful gpt-4 will be much more slower)</inlineHelpText>
+    <label>openAPI version</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>text-davinci-003</fullName>
+                <default>true</default>
+                <label>text-davinci-003</label>
+            </value>
+            <value>
+                <fullName>gpt-4</fullName>
+                <default>false</default>
+                <label>gpt-4</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
