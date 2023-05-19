@@ -101,6 +101,21 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>EinsteinGPTConfig__c.Word_by_word_Max__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>EinsteinGPTConfig__c.Word_by_word_Min__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>EinsteinGPTConfig__c.openApi_version__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>EinsteinGPTConfig__c.styleFooterBorderTop__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -166,6 +181,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>ScenarioMessageElement__c.html_Content__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>ScenarioMessageElement__c.image_URL__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -182,6 +202,31 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>ScenarioMessageElement__c.loading_Wait__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>ScenarioMessageElement__c.redirection_RecordId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>ScenarioMessageElement__c.redirection_Type__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>ScenarioMessageElement__c.redirection_actionName__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>ScenarioMessageElement__c.redirection_objectApiName__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>ScenarioMessageElement__c.redirection_pageName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -334,11 +379,19 @@
         <visible>true</visible>
     </recordTypeVisibilities>
     <recordTypeVisibilities>
+        <recordType>ScenarioMessageElement__c.HTML</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
         <recordType>ScenarioMessageElement__c.Image</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
     <recordTypeVisibilities>
         <recordType>ScenarioMessageElement__c.Loading</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>ScenarioMessageElement__c.Redirection</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
     <recordTypeVisibilities>
