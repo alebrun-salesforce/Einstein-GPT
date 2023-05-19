@@ -44,6 +44,23 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
+                <fieldItem>Record.openApi_version__c</fieldItem>
+                <identifier>RecordopenApi_version_cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Enable_OpenAI__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
                 <fieldItem>Record.Prompt__c</fieldItem>
                 <identifier>RecordPrompt_cField</identifier>
                 <visibilityRule>
@@ -167,23 +184,6 @@
                         <leftValue>{!Record.Message_source_type__c}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>Basic responses</rightValue>
-                    </criteria>
-                </visibilityRule>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Scenario__c</fieldItem>
-                <identifier>RecordScenario_cField</identifier>
-                <visibilityRule>
-                    <criteria>
-                        <leftValue>{!Record.Message_source_type__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>Scenario by ID</rightValue>
                     </criteria>
                 </visibilityRule>
             </fieldInstance>

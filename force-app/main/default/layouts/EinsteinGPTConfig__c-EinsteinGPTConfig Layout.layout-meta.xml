@@ -107,6 +107,10 @@
                 <behavior>Edit</behavior>
                 <field>Word_by_word_Max__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>openApi_version__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
