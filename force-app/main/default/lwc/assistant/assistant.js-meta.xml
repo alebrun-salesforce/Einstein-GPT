@@ -26,6 +26,10 @@
 
             <property name="AutoMessage" label="Test: Auto message" type="Boolean" description="Use it to generate all messages" default="False" />
             <property name="FullHeight" label="Full height" type="Boolean" description="Full height" default="False" />
+
+             <property name="saveHistory" label="Save history" type="Boolean" description="Save user and AI messages" default="False" />
+             <property name="loadHistory" label="Load history of the related config" type="Boolean" description="Load history" default="False" />
+             <property name="deleteHistory" label="Delete history once loaded" type="Boolean" description="Load and delete" default="True" />
         </targetConfig>
 
             
@@ -59,6 +63,10 @@
             <property name="AutoMessage" label="Test: Auto message" type="Boolean" description="Use it to generate all messages" default="False" />
 
             <property name="FullHeight" label="Full height" type="Boolean" description="Full height" default="False" />
+
+            <property name="saveHistory" label="Save history" type="Boolean" description="Save user and AI messages" default="True" />
+             <property name="loadHistory" label="Load history of the related config" type="Boolean" description="Load history" default="True" />
+             <property name="deleteHistory" label="Delete history once loaded" type="Boolean" description="Load and delete" default="True" />
         </targetConfig>
 
 

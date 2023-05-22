@@ -61,10 +61,6 @@
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>
-        <relatedList>MessageHistory__c.Scenario__c</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>NAME</fields>
         <relatedList>EinsteinGPTConfig__c.Scenario__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>

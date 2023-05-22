@@ -2,6 +2,9 @@ import { LightningElement, api, wire } from 'lwc';
 import getScenarioMessages from '@salesforce/apex/AiAssistantMessageController.getScenarioMessages';
 import getConfigs from '@salesforce/apex/EinsteinGPTConfigManager.getConfigs'
 import createDefaultConfig from '@salesforce/apex/EinsteinGPTConfigManager.createDefaultConfig'
+import addMessageToConfig from '@salesforce/apex/EinsteinGPTHistoryController.addMessageToConfig'
+import loadMessagesFromConfig from '@salesforce/apex/EinsteinGPTHistoryController.loadMessagesFromConfig'
+import deleteMessagesFromConfig from '@salesforce/apex/EinsteinGPTHistoryController.deleteMessagesFromConfig'
 import { NavigationMixin } from 'lightning/navigation';
 import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
 import { getRecord } from 'lightning/uiRecordApi';
@@ -11,6 +14,7 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
   @api configName = "Default Config";
   loadedConfiguration;
   allconfigs;
+  configId = "0";
 
 
   aiAssistantMessage = 'Hello! I am your AI assistant. How can I help you today?';
@@ -88,7 +92,11 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
 
   wordByWordMin = 1;
   wordByWordMax = 5;
- 
+
+  /** History */
+@api saveHistory = false;
+@api loadHistory= false;
+@api deleteHistory= false;
 
   @wire(getScenarioMessages)
   AiAssistantMessages;
@@ -98,6 +106,14 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
 
   @wire(createDefaultConfig)
   createDefaultConfig;
+
+  @wire(loadMessagesFromConfig)
+  loadMessagesFromConfig;
+
+  @wire(addMessageToConfig)
+  addMessageToConfig;
+  @wire(deleteMessagesFromConfig)
+  deleteMessagesFromConfig;
 
   record;
   error;
@@ -453,6 +469,7 @@ try {
       if (matchingConfig) {
         this.loadedConfiguration = matchingConfig;
         if (this.loadedConfiguration) {
+          this.configId = this.loadedConfiguration.Id;
           this.aiAssistantMessage = this.loadedConfiguration.Initial_message__c;
           this.aiAvatarUrl = this.loadedConfiguration.AI_avatar_Image__c;
           this.userAvatarUrl = this.loadedConfiguration.User_Avatar_Image__c;
@@ -597,6 +614,27 @@ try {
                       if(this.responses && this.responses.length > 0) nextMessage = this.responses[0].message;
                       if(this.loadedConfiguration) this.typeMessage(this.aiAssistantMessage, 'ai-message', 0, nextMessage);
                   }
+                  
+                  if(this.loadHistory){
+                  loadMessagesFromConfig({ configId: this.configId })
+                  .then(result => {
+                      // handle successful response
+                      // 'result' will be a list of MessageHistory__c objects
+                      var messages = result;
+                      for(var i in messages){
+                        if(!messages[i].UserMessage__c || !messages[i].AiMessage__c) continue;
+                          this.addChatMessage(messages[i].UserMessage__c, "user-message", this.userAvatarUrl);
+                          this.addChatMessage(messages[i].AiMessage__c, "ai-message", this.aiAvatarUrl);   
+                      };
+                  })
+                  .catch(error => {
+                      // handle error
+                      console.error('Error in loading messages: ', error);
+                  });
+                  this.deleteMessages()
+                }
+
+
               })
               .catch((error) => {
                   console.error('Error fetching Scenario messages:', error.message, JSON.stringify(error));
@@ -724,15 +762,47 @@ try {
       });
   };
 
+
+deleteMessages() {
+    if(!this.deleteHistory) return true;
+    deleteMessagesFromConfig({ configId: this.configId })
+        .then(() => {
+            // handle successful response
+            //console.log('Successfully deleted messages.');
+        })
+        .catch(error => {
+            // handle error
+            console.error('Error in deleting messages: ', error);
+        });
+}
+
+
+  // method to add message to config
+  async saveMessage(usermessage, aimessage) {
+    if(!this.saveHistory) return false;
+    if(!usermessage && !aimessage) return false;
+  addMessageToConfig({ configId: this.configId, usermessage: usermessage, aimessage: aimessage })
+      .then(result => {
+          // handle successful response
+          //console.log('Message added successfully');
+      })
+      .catch(error => {
+          // handle error
+          console.error('Error in adding message: ', error);
+      });
+}
   
   ///// TYPE //////
-  async typeMessage(message, messageClass, typingSpeed, userMessage, extraContent, response) {
+  async typeMessage(message, messageClass, typingSpeed, userMessage, extraContent, response, userRealMessage) {
+    if(!userRealMessage) userRealMessage = "";
     if(!message) message = "";
     message = message.replace(/<ul>/gi, '<ol class="slds-list_dotted">');
     message = message.replace(/<\/ul>/gi, '</ol>');
     message = message.replace(/<ol>/gi, '<ol class="slds-list_dotted">');
     if (typingSpeed === 0) {
-      return this.directMessage(message, messageClass, userMessage);
+      const messageContent = this.directMessage(message, messageClass, userMessage);
+      this.saveMessage(userRealMessage, messageContent.innerHTML);
+      return true;
     }
     const avatarSrc = this.aiAvatarUrl;
     const messageContent = this.addChatMessage('', messageClass, avatarSrc, extraContent);
@@ -741,6 +811,7 @@ try {
     }
 
     await this.typeWithEffect(messageContent, message, typingSpeed, extraContent, response);
+    this.saveMessage(userRealMessage, messageContent.innerHTML);
   
     // Handle additional behaviors
     if (response) {
@@ -753,19 +824,33 @@ try {
   }
   
   async typeWithEffect(messageContent, message, typingSpeed, extraContent, response) {
+    // If no htmltag in messageContent then convert all breaklines by <br>c/assistant
+    const regex = /<[a-z][\s\S]*>/i;
+    const tagfound = message.match(regex);
+    console.log(message);
+    if(!tagfound || !tagfound.length) {
+        console.log("hey");
+        // Replace newline characters with HTML breakline tag
+        message = message.replace(/\n/g, '<br>');
+    }
+    
+
+    if(!message) message= " ";
     const words = this.splitMessageWithTags(message, this.wordByWordMin, this.wordByWordMax);
-  
     // Create a span element for the cursor
     const cursor = document.createElement('span');
     cursor.classList.add('blinking-cursor');
     cursor.textContent = '|';
   
     let loadingElementFound = false;
+		let allcontent = "";
   
     // Check for Loading elements
     for (let i in response.elements) {
       if (response.elements[i].recordTypeName == "Loading") {
-        messageContent.innerHTML = response.elements[i].loadingText;
+        if(!response.elements[i].loadingText) response.elements[i].loadingText = "";
+
+        messageContent.innerHTML = allcontent + response.elements[i].loadingText;
         messageContent.innerHTML += `<div role="status" class="slds-spinner slds-spinner_medium">
         <span class="slds-assistive-text">Loading</span>
         <div class="slds-spinner__dot-a"></div>
@@ -774,17 +859,17 @@ try {
   
         // Wait response.elements[i].loadingWait milliseconds
         await this.wait(response.elements[i].loadingWait);
-        messageContent.innerHTML = response.elements[i].loadingTextAfter;
-  
+        if(!response.elements[i].loadingTextAfter) response.elements[i].loadingTextAfter ="";
+        messageContent.innerHTML = allcontent + response.elements[i].loadingTextAfter;
+				allcontent += response.elements[i].loadingTextAfter;
         loadingElementFound = true;
-        break;
       }
     }
   
     loadingElementFound = false;
     // If no loading element is found, continue typing immediately
     if (!loadingElementFound) {
-      var allcontent = "";
+
       for (const word of words) {
         allcontent+=word;
     
@@ -800,13 +885,15 @@ try {
           //messageContent.innerHTML += word;
         }
         this.scrollChatToBottom();
-  
         // Add a blinking cursor at the end of the message only if there are more words to type
         if (words.length > 0) {
           messageContent.appendChild(cursor);
         }
   
+					if (word.startsWith('<') && word.endsWith('>')) {
+					} else {
         await this.wait(this.getRandomTypingSpeed(typingSpeed));
+							}
   
         // Remove the blinking cursor before the next word
         if (cursor.parentNode) {
@@ -816,7 +903,7 @@ try {
       }
     }
   
-    messageContent.innerHTML = message;
+    messageContent.innerHTML = allcontent;
 
     // Append extraContent if it's a DOM element
     if (extraContent instanceof HTMLElement) {
@@ -882,7 +969,7 @@ try {
       }, 500);
     }
   
-    return true;
+    return messageContent;
   }
   
   focusInput() {
@@ -926,6 +1013,8 @@ try {
   }
   
   splitMessageWithTags(message, minLength, maxLength) {
+    if(!minLength) minLength = 5;
+    if(!maxLength) maxLength = 10;
     const regex = /(<[^>]*>|[^<>]+)/g;
     const splitMessage = message.match(regex);
     const res = [];
@@ -1147,7 +1236,7 @@ ${airesponse}
       this.responseCounter++;
       var nextMessage = "";
       if (this.responseCounter < this.responses.length) nextMessage = this.responses[this.responseCounter].userMessage;
-      this.typeMessage(response.aiMessage, 'ai-message', this.aiTypingSpeed, nextMessage, elementContent, response);
+      this.typeMessage(response.aiMessage, 'ai-message', this.aiTypingSpeed, nextMessage, elementContent, response, userMessage);
       this.chatFocus();
     } else {
       this.lockInput(false);

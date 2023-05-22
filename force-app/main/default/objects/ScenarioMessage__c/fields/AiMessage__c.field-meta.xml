@@ -3,10 +3,12 @@
     <fullName>AiMessage__c</fullName>
     <description>Reply from the AI</description>
     <externalId>false</externalId>
-    <inlineHelpText>Reply from the AI</inlineHelpText>
+    <inlineHelpText>Reply from the AI. You can use simple HTML tags (&lt;b&gt;, &lt;p&gt;, &lt;br /&gt;) or more advanced component: https://www.lightningdesignsystem.com/.
+
+If there is no HTML tags, breaks will be automatically converted into &lt;br /&gt;</inlineHelpText>
     <label>AiMessage</label>
     <length>32768</length>
     <trackTrending>false</trackTrending>
-    <type>Html</type>
-    <visibleLines>25</visibleLines>
+    <type>LongTextArea</type>
+    <visibleLines>50</visibleLines>
 </CustomField>

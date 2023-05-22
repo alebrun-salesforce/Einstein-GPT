@@ -53,6 +53,18 @@
                     <name>configName</name>
                     <value>Default Config</value>
                 </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>deleteHistory</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>loadHistory</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>saveHistory</name>
+                    <value>true</value>
+                </componentInstanceProperties>
                 <componentName>assistant</componentName>
                 <identifier>c_assistant</identifier>
             </componentInstance>
