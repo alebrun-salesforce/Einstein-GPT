@@ -714,7 +714,7 @@ try {
 
 
     //ICI
-    if((!this.responses || !this.responses.length || this.responseCounter >= this.responses.length) && (this.scenarios && this.scenarios.length))
+    if(messageClass=="user-message" && (!this.responses || !this.responses.length || this.responseCounter >= this.responses.length) && (this.scenarios && this.scenarios.length))
     {
         for(var i in this.scenarios){
 
