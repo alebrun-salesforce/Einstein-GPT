@@ -60,8 +60,8 @@ public with sharing class EinsteinGPTConfigManager {
                 styleHeaderColor__c='black',
                 styleHeaderHide__c=false,
                 styleInboxBorder__c='1px solid grey',
-                Word_by_word_Max__c=5,
-                Word_by_word_Min__c=1
+                Word_by_word_Max__c=15,
+                Word_by_word_Min__c=5
             );
             insert defaultConfig;
         }

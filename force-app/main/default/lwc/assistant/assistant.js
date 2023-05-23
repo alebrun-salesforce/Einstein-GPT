@@ -158,50 +158,36 @@ export default class AiAssistant extends NavigationMixin(LightningElement) {
 
 
   async generateCompletion(prompt, maxTokens) {
-    let endpoint;
-    let requestBody;
-    if (this.openAiApiVersion == "gpt-4") {
-        endpoint = 'https://api.openai.com/v1/chat/completions';
-
-        requestBody = {
-            model: this.openAiApiVersion,
-            messages: [
-                {"role": "system", "content": "Start of the conversation"},
-                {"role": "user", "content": prompt}
-            ],
-        };
-    } else {
-        endpoint = 'https://api.openai.com/v1/completions';
-        requestBody = {
-            model: 'text-davinci-003',
-            prompt: prompt,
-            temperature: 0.7,
-            max_tokens: maxTokens,
-            top_p: 1,
-            frequency_penalty: 0,
-            presence_penalty: 0,
-        };
-    }
-
-    const requestOptions = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.openAiApiKey}`,
-        },
-        body: JSON.stringify(requestBody),
+    const endpoint = 'https://api.openai.com/v1/completions';
+    const requestBody = {
+      model: 'text-davinci-003',
+      prompt: prompt,
+      temperature: 0.7,
+      max_tokens: maxTokens,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
     };
-
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.openAiApiKey}`,
+      },
+      body: JSON.stringify(requestBody),
+    };
+  
     try {
-        const response = await fetch(endpoint, requestOptions);
-        const jsonResponse = await response.json();
-        const completionText = this.openAiApiVersion == "gpt-4" ? jsonResponse.choices[0].message.content : jsonResponse.choices[0].text;
-        return completionText;
+      const response = await fetch(endpoint, requestOptions);
+      const jsonResponse = await response.json();
+      const completionText = jsonResponse.choices[0].text;
+      return completionText;
     } catch (error) {
-        console.error('Error calling generateCompletion:', error);
-        return null;
+      console.error('Error calling generateCompletion:', error);
+      return null;
     }
-}
+
+  }
 
   
   history = "";
@@ -452,8 +438,6 @@ applyConfigStyle(){
     }
 }
 
-
-
   connectedCallback() {
 
 createDefaultConfig()
@@ -703,7 +687,7 @@ try {
     }
   }
 
-  addChatMessage(message, messageClass, avatarSrc) {
+  addChatMessage(message, messageClass, avatarSrc, ignoreScenario) {
     if (message.startsWith("/config ")) {
       const confname = message.split("config ")[1];
       this.updateConfig(confname);
@@ -714,7 +698,7 @@ try {
 
 
     //ICI
-    if(messageClass=="user-message" && (!this.responses || !this.responses.length || this.responseCounter >= this.responses.length) && (this.scenarios && this.scenarios.length))
+    if(!ignoreScenario && messageClass=="user-message" && (!this.responses || !this.responses.length || this.responseCounter >= this.responses.length) && (this.scenarios && this.scenarios.length))
     {
         for(var i in this.scenarios){
 
@@ -805,7 +789,7 @@ deleteMessages() {
       return true;
     }
     const avatarSrc = this.aiAvatarUrl;
-    const messageContent = this.addChatMessage('', messageClass, avatarSrc, extraContent);
+    const messageContent = this.addChatMessage('', messageClass, avatarSrc, extraContent, true);
     if (!messageContent) {
       return false;
     }
@@ -827,9 +811,7 @@ deleteMessages() {
     // If no htmltag in messageContent then convert all breaklines by <br>c/assistant
     const regex = /<[a-z][\s\S]*>/i;
     const tagfound = message.match(regex);
-    console.log(message);
     if(!tagfound || !tagfound.length) {
-        console.log("hey");
         // Replace newline characters with HTML breakline tag
         message = message.replace(/\n/g, '<br>');
     }
@@ -950,7 +932,7 @@ deleteMessages() {
   
   
   async directMessage(message, messageClass, userMessage) {
-    const messageContent = this.addChatMessage(message, messageClass, this.aiAvatarUrl);
+    const messageContent = this.addChatMessage(message, messageClass, this.aiAvatarUrl, true);
     this.lockInput(false);
   
     if (!messageContent) {
