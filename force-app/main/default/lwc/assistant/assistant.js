@@ -382,13 +382,13 @@ handleStatusChange(event) {
             aiAssistantContainer.style.setProperty('--chat-left', '0');
             aiAssistantContainer.style.setProperty('--chat-right', 'auto');
             aiAssistantContainer.style.setProperty('--chat-bottom', '0');
-            aiAssistantContainer.style.setProperty('--chat-zindex', '500');
+            aiAssistantContainer.style.setProperty('--chat-zindex', '10000');
           } else {
             aiAssistantContainer.style.setProperty('--chat-top', '90px');
             aiAssistantContainer.style.setProperty('--chat-left', 'auto');
             aiAssistantContainer.style.setProperty('--chat-right', '0');
             aiAssistantContainer.style.setProperty('--chat-bottom', '0');
-            aiAssistantContainer.style.setProperty('--chat-zindex', '500');
+            aiAssistantContainer.style.setProperty('--chat-zindex', '10000');
             if(this.FullHeight){
               aiAssistantContainer.style.setProperty('--chat-bottom', "0px");
               aiAssistantContainer.style.setProperty('--chat-top', "0px");
