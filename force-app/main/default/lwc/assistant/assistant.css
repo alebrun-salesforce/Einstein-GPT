@@ -17,6 +17,10 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
 
+  .modalz{
+    z-index:999999999;
+  }
+
   .blinking-cursor {
     animation: blink 1s step-end infinite;
     background-color: black;
